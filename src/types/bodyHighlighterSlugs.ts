@@ -5,110 +5,102 @@ export type BodyHighlighterSlug = Slug;
 
 /**
  * Mapping from our internal MuscleRegion to the library's slug(s).
- * Some of our regions map to a single slug, others map to multiple for better visual coverage.
+ * All 17 tracked muscle regions map 1:1 to library slugs.
  */
 export const REGION_TO_SLUGS: Record<MuscleRegion, BodyHighlighterSlug[]> = {
+  neck: ['neck'],
   shoulders: ['deltoids'],
   chest: ['chest'],
   biceps: ['biceps'],
+  triceps: ['triceps'],
   forearms: ['forearm'],
-  abs: ['abs'],
-  quads: ['quadriceps'],
-  calves: ['calves'],
-  lats: ['upper-back'],
   traps: ['trapezius'],
+  lats: ['upper-back'],
+  'lower-back': ['lower-back'],
+  abs: ['abs'],
+  obliques: ['obliques'],
+  quads: ['quadriceps'],
   hamstrings: ['hamstring'],
   glutes: ['gluteal'],
+  adductors: ['adductors'],
+  calves: ['calves'],
+  tibialis: ['tibialis'],
 };
 
 /**
- * Reverse mapping: from library slug back to our MuscleRegion (if tracked).
- * Slugs not in our model return undefined.
+ * Reverse mapping: from library slug back to our MuscleRegion.
+ * All 17 muscle-relevant slugs are now tracked.
  */
-export const SLUG_TO_REGION: Partial<Record<BodyHighlighterSlug, MuscleRegion>> = {
+export const SLUG_TO_REGION: Record<BodyHighlighterSlug, MuscleRegion | undefined> = {
+  neck: 'neck',
   deltoids: 'shoulders',
   chest: 'chest',
   biceps: 'biceps',
+  triceps: 'triceps',
   forearm: 'forearms',
-  abs: 'abs',
-  quadriceps: 'quads',
-  calves: 'calves',
-  'upper-back': 'lats',
   trapezius: 'traps',
+  'upper-back': 'lats',
+  'lower-back': 'lower-back',
+  abs: 'abs',
+  obliques: 'obliques',
+  quadriceps: 'quads',
   hamstring: 'hamstrings',
   gluteal: 'glutes',
+  adductors: 'adductors',
+  calves: 'calves',
+  tibialis: 'tibialis',
+  // Non-muscle parts (not tracked)
+  head: undefined,
+  hair: undefined,
+  hands: undefined,
+  feet: undefined,
+  knees: undefined,
+  ankles: undefined,
 };
 
 /**
- * Library slugs we don't currently track in our muscle model.
- * These will use defaultFill (fresh/untracked appearance).
- *
- * Gaps and recommendations:
- * - triceps: Distinct muscle, consider adding to our model (pushed by bench, dips, pushdowns)
- * - obliques: Could merge with 'abs' or track separately
- * - lower-back: Could add as separate region (deadlifts, rows)
- * - adductors: Inner thigh - could merge into 'quads' category or add
- * - tibialis: Front shin - low priority, rarely isolated
- * - neck: Could add for shrug/neck work
- * - hands/feet/head/hair/ankles/knees: Non-muscle parts, fine to leave untracked
- *
- * Note: The library's README mentions "abductors" but the TypeScript types don't include it.
+ * Non-muscle body parts in the library (not tracked for recovery).
+ * These will use defaultFill appearance.
  */
-export const UNTRACKED_SLUGS: BodyHighlighterSlug[] = [
-  'triceps',
-  'obliques',
-  'lower-back',
-  'adductors',
-  'tibialis',
-  'neck',
-  'hands',
-  'feet',
+export const NON_MUSCLE_SLUGS: BodyHighlighterSlug[] = [
   'head',
   'hair',
-  'ankles',
+  'hands',
+  'feet',
   'knees',
+  'ankles',
 ];
 
 /**
- * Slugs visible on front view of the body
+ * Muscle slugs visible on front view of the body
  */
-export const FRONT_SLUGS: BodyHighlighterSlug[] = [
+export const FRONT_MUSCLE_SLUGS: BodyHighlighterSlug[] = [
+  'neck',
   'deltoids',
   'chest',
   'biceps',
   'forearm',
   'abs',
+  'obliques',
   'quadriceps',
+  'adductors',
   'calves',
   'tibialis',
-  'obliques',
-  'neck',
-  'head',
-  'hands',
-  'feet',
-  'ankles',
-  'knees',
-  'hair',
 ];
 
 /**
- * Slugs visible on back view of the body
+ * Muscle slugs visible on back view of the body
  */
-export const BACK_SLUGS: BodyHighlighterSlug[] = [
+export const BACK_MUSCLE_SLUGS: BodyHighlighterSlug[] = [
+  'neck',
   'deltoids',
-  'trapezius',
   'triceps',
   'forearm',
+  'trapezius',
   'upper-back',
   'lower-back',
   'hamstring',
   'gluteal',
-  'calves',
   'adductors',
-  'neck',
-  'head',
-  'hands',
-  'feet',
-  'ankles',
-  'hair',
+  'calves',
 ];
