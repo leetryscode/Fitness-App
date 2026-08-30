@@ -1,15 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import { FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ChatBubble } from './ChatBubble';
-import { ChatMessage } from '../../types/entry';
+import { ChatMessage, SessionEffort } from '../../types/entry';
 import { colors, spacing } from '../../theme/tokens';
 
 type Props = {
   messages: ChatMessage[];
   isLoading?: boolean;
+  onEffortChange?: (entryId: string, effort: SessionEffort | null) => void;
 };
 
-export function ChatThread({ messages, isLoading }: Props) {
+export function ChatThread({ messages, isLoading, onEffortChange }: Props) {
   const listRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -25,7 +26,9 @@ export function ChatThread({ messages, isLoading }: Props) {
       ref={listRef}
       data={messages}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <ChatBubble message={item} />}
+      renderItem={({ item }) => (
+        <ChatBubble message={item} onEffortChange={onEffortChange} />
+      )}
       contentContainerStyle={styles.content}
       ListFooterComponent={
         isLoading ? (

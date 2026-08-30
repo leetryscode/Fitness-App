@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, EntrySource } from '../types/entry';
-import { insertEntry, getAllEntries } from '../db/entries';
+import { ChatMessage, EntrySource, SessionEffort, SetDetail } from '../types/entry';
+import { MuscleRegion } from '../types/muscles';
+import { insertEntry, getAllEntries, updateEntryEffort } from '../db/entries';
 import { sendWorkoutMessage } from '../llm/client';
 
 export function useChat(onEntryAdded?: () => void) {
@@ -27,6 +28,9 @@ export function useChat(onEntryAdded?: () => void) {
         role: 'assistant',
         content: entry.rawAiResponse,
         timestamp: entry.timestamp + 1,
+        entryId: entry.id,
+        sessionEffort: entry.sessionEffort,
+        hasMuscles: entry.parsedMuscleTags.length > 0,
       });
     }
     setMessages(history);
@@ -80,20 +84,39 @@ export function useChat(onEntryAdded?: () => void) {
         });
 
         const hasMuscles = response.muscles.length > 0;
+
+        const sessionEffort: SessionEffort | null =
+          response.session_effort ?? null;
+
+        const sets: SetDetail[] | null = response.sets
+          ? response.sets.map((s) => ({
+              muscleSlugs: s.muscle_slugs as MuscleRegion[],
+              rpe: s.rpe,
+              order: s.order,
+            }))
+          : null;
+
+        const entryId = uuidv4();
         await insertEntry({
+          id: entryId,
           timestamp: Date.now(),
           rawUserText: text || null,
           rawAiResponse: response.summary,
           imageReference: imageReference ?? null,
           parsedMuscleTags: hasMuscles ? response.muscles : [],
           source: source ?? (imageBase64 ? 'photo' : 'chat'),
+          sessionEffort,
+          sets,
         });
 
         const assistantMsg: ChatMessage = {
-          id: uuidv4(),
+          id: `${entryId}-assistant`,
           role: 'assistant',
           content: response.summary,
           timestamp: Date.now(),
+          entryId,
+          sessionEffort,
+          hasMuscles,
         };
         setMessages((prev) => [...prev, assistantMsg]);
         onEntryAdded?.();
@@ -115,5 +138,18 @@ export function useChat(onEntryAdded?: () => void) {
     [messages, onEntryAdded]
   );
 
-  return { messages, isLoading, error, sendMessage, loadHistory };
+  const updateEffort = useCallback(
+    async (entryId: string, effort: SessionEffort | null) => {
+      await updateEntryEffort(entryId, effort);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.entryId === entryId ? { ...m, sessionEffort: effort } : m
+        )
+      );
+      onEntryAdded?.();
+    },
+    [onEntryAdded]
+  );
+
+  return { messages, isLoading, error, sendMessage, loadHistory, updateEffort };
 }

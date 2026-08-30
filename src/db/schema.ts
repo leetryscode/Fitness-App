@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const CREATE_ENTRIES_TABLE = `
   CREATE TABLE IF NOT EXISTS entries (
@@ -8,7 +8,9 @@ export const CREATE_ENTRIES_TABLE = `
     raw_ai_response TEXT NOT NULL,
     image_reference TEXT,
     parsed_muscle_tags TEXT NOT NULL,
-    source TEXT NOT NULL CHECK(source IN ('chat', 'photo'))
+    source TEXT NOT NULL CHECK(source IN ('chat', 'photo')),
+    session_effort TEXT CHECK(session_effort IS NULL OR session_effort IN ('very_light', 'easy', 'moderate', 'hard', 'max')),
+    sets TEXT
   );
 `;
 
@@ -22,3 +24,10 @@ export const CREATE_SETTINGS_TABLE = `
 export const CREATE_ENTRIES_INDEX = `
   CREATE INDEX IF NOT EXISTS idx_entries_timestamp ON entries(timestamp DESC);
 `;
+
+export const MIGRATIONS: Record<number, string[]> = {
+  2: [
+    `ALTER TABLE entries ADD COLUMN session_effort TEXT CHECK(session_effort IS NULL OR session_effort IN ('very_light', 'easy', 'moderate', 'hard', 'max'))`,
+    `ALTER TABLE entries ADD COLUMN sets TEXT`,
+  ],
+};

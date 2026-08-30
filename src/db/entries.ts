@@ -1,6 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from './init';
-import { Entry, MuscleTag, EntrySource } from '../types/entry';
+import {
+  Entry,
+  MuscleTag,
+  EntrySource,
+  SessionEffort,
+  SetDetail,
+} from '../types/entry';
 
 type EntryRow = {
   id: string;
@@ -10,6 +16,8 @@ type EntryRow = {
   image_reference: string | null;
   parsed_muscle_tags: string;
   source: EntrySource;
+  session_effort: SessionEffort | null;
+  sets: string | null;
 };
 
 function rowToEntry(row: EntryRow): Entry {
@@ -21,19 +29,30 @@ function rowToEntry(row: EntryRow): Entry {
     imageReference: row.image_reference,
     parsedMuscleTags: JSON.parse(row.parsed_muscle_tags) as MuscleTag[],
     source: row.source,
+    sessionEffort: row.session_effort ?? null,
+    sets: row.sets ? (JSON.parse(row.sets) as SetDetail[]) : null,
   };
 }
 
 export async function insertEntry(
-  entry: Omit<Entry, 'id'> & { id?: string }
+  entry: Omit<Entry, 'id' | 'sessionEffort' | 'sets'> & {
+    id?: string;
+    sessionEffort?: SessionEffort | null;
+    sets?: SetDetail[] | null;
+  }
 ): Promise<Entry> {
   const database = await getDatabase();
   const id = entry.id ?? uuidv4();
-  const fullEntry: Entry = { ...entry, id };
+  const fullEntry: Entry = {
+    ...entry,
+    id,
+    sessionEffort: entry.sessionEffort ?? null,
+    sets: entry.sets ?? null,
+  };
 
   await database.runAsync(
-    `INSERT INTO entries (id, timestamp, raw_user_text, raw_ai_response, image_reference, parsed_muscle_tags, source)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO entries (id, timestamp, raw_user_text, raw_ai_response, image_reference, parsed_muscle_tags, source, session_effort, sets)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       fullEntry.id,
       fullEntry.timestamp,
@@ -42,10 +61,23 @@ export async function insertEntry(
       fullEntry.imageReference,
       JSON.stringify(fullEntry.parsedMuscleTags),
       fullEntry.source,
+      fullEntry.sessionEffort,
+      fullEntry.sets ? JSON.stringify(fullEntry.sets) : null,
     ]
   );
 
   return fullEntry;
+}
+
+export async function updateEntryEffort(
+  id: string,
+  sessionEffort: SessionEffort | null
+): Promise<void> {
+  const database = await getDatabase();
+  await database.runAsync(
+    `UPDATE entries SET session_effort = ? WHERE id = ?`,
+    [sessionEffort, id]
+  );
 }
 
 export async function getAllEntries(): Promise<Entry[]> {
