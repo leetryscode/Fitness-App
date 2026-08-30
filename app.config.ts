@@ -42,13 +42,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-secure-store',
     'expo-sharing',
     [
-      'expo-notifications',
-      {
-        icon: './assets/icon.png',
-        color: '#000000',
-      },
-    ],
-    [
       'expo-image-picker',
       {
         cameraPermission:

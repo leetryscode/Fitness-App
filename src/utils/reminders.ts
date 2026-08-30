@@ -44,42 +44,11 @@ function getQuietDays(entries: { timestamp: number }[], now: Date): number {
 }
 
 export async function checkAndScheduleReminder(): Promise<void> {
-  const enabled = await getBooleanSetting('reminderEnabled', true);
-  if (!enabled) return;
-
-  const threshold = await getNumberSetting('quietDaysThreshold', 3);
-  const hasPermission = await requestNotificationPermission();
-  if (!hasPermission) return;
-
-  const entries = await getAllEntries();
-  const quietDays = getQuietDays(entries, new Date());
-
-  if (quietDays >= threshold) {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Gym Recovery',
-        body: `It's been ${quietDays} quiet days — log a workout or check your recovery map.`,
-      },
-      trigger: null,
-    });
-  }
+  // Push/local reminders disabled for initial TestFlight build.
+  // Re-enable after configuring APNs credentials in EAS.
+  return;
 }
 
 export async function scheduleDailyReminderCheck(): Promise<void> {
-  const enabled = await getBooleanSetting('reminderEnabled', true);
-  if (!enabled) return;
-
-  await Notifications.cancelAllScheduledNotificationsAsync();
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Gym Recovery',
-      body: 'Check in on your recovery — open the app to see your body map.',
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: 10,
-      minute: 0,
-    },
-  });
+  return;
 }
