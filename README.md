@@ -1,6 +1,8 @@
-# Gym Recovery
+# Fitness App
 
-A personal iOS app for logging workouts through casual chat and tracking muscle recovery on a color-coded body map.
+A personal, single-user iOS app: log workouts by chatting or snapping a photo of a machine, and see a color-coded body map of which muscles are fatigued vs. recovered.
+
+No workout plans, no exercise picklists, no rep/weight forms required. Just talk to it, and it keeps a visual map of your recovery state.
 
 ## What it does
 
@@ -16,13 +18,23 @@ A personal iOS app for logging workouts through casual chat and tracking muscle 
 - expo-router (2 screens: main + settings modal)
 - expo-sqlite, expo-secure-store, expo-image-picker
 - Provider-swappable LLM client (OpenAI-compatible API shape)
+- Development builds via EAS, TestFlight for dogfooding
+
+## Scope (v1)
+
+- Chat-based workout logging (text or voice)
+- Camera photo of a gym machine → auto-identify + muscle tag
+- Color-coded recovery body map (front/back), per-muscle decay rates
+- In-chat "what else should I do" suggestions
+
+Not in v1: workout plans/programs, mandatory set/rep logging, social features, cloud sync, graphs/analytics, exercise database.
 
 ## Getting started
 
 ### Prerequisites
 
 - Node.js 18+
-- [EAS CLI](https://docs.expo.dev/build/setup/) (`npm install -g eas-cli`)
+- [EAS CLI](https://docs.expo.dev/build/setup/) (`npx eas-cli`)
 - Apple Developer account (for TestFlight)
 
 ### Install
@@ -47,67 +59,55 @@ npx expo start --dev-client
 
 ### iOS signing with App Store Connect API Key (no Apple ID login)
 
-If EAS cannot sign you in with an Apple ID, use an **App Store Connect API key** instead. This is the recommended approach for CI and often more reliable than Apple ID login.
+If EAS cannot sign you in with an Apple ID, use an **App Store Connect API key** instead.
 
-**1. Create the key** (one-time, in a browser):
+**1. Create the key** at [App Store Connect → Integrations → API](https://appstoreconnect.apple.com/access/integrations/api)
 
-1. Go to [App Store Connect → Users and Access → Integrations → App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api)
-2. Click **Generate API Key** (or use an existing key with **Admin** or **App Manager** role)
-3. Download the `.p8` file (you can only download it once)
-4. Note the **Key ID** and **Issuer ID** (shown on the same page)
-
-**2. Store the key locally** (never commit it — `*.p8` is gitignored):
+**2. Store the key locally** (never commit — `*.p8` is gitignored):
 
 ```bash
 mkdir -p credentials
-mv ~/Downloads/AuthKey_XXXXXXXXXX.p8 credentials/asc-api-key.p8
+# Windows PowerShell:
+copy $env:USERPROFILE\Downloads\AuthKey_4FG26BT4YV.p8 .\credentials\asc-api-key.p8
 ```
+
+Or drag the `.p8` file into the `credentials/` folder in Cursor's file explorer.
 
 **3. Set environment variables** before building:
 
 ```bash
 export EXPO_APPLE_APP_STORE_CONNECT_KEY_PATH="./credentials/asc-api-key.p8"
-export EXPO_APPLE_APP_STORE_CONNECT_KEY_ID="YOUR_KEY_ID"        # e.g. ABC123XYZ
-export EXPO_APPLE_APP_STORE_CONNECT_ISSUER_ID="YOUR_ISSUER_ID"  # UUID from App Store Connect
+export EXPO_APPLE_APP_STORE_CONNECT_KEY_ID="YOUR_KEY_ID"
+export EXPO_APPLE_APP_STORE_CONNECT_ISSUER_ID="YOUR_ISSUER_ID"
 ```
 
-**4. Configure credentials** (one-time):
+**4. Configure credentials and build:**
 
 ```bash
 npx eas-cli credentials --platform ios
-```
-
-When prompted, choose **App Store Connect API Key** (not Apple ID). EAS will use the env vars above and store the credentials remotely for future builds.
-
-**5. Build:**
-
-```bash
 npx eas-cli build --profile development --platform ios
 ```
 
 ### Expo account access token (if `eas login` fails)
 
-If you cannot sign in to your Expo account interactively, create an access token at [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens), then:
+Create a token at [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens), then:
 
 ```bash
 export EXPO_TOKEN="your_expo_access_token"
 npx eas-cli build --profile development --platform ios
 ```
 
-
-### Configure API key
+### Configure LLM API key (in the app)
 
 1. Open the app → tap the gear icon
 2. Enter your LLM provider API key (OpenAI, Qwen, or Gemini)
 3. Pick a model and start logging
 
-API keys are stored on-device only and sent directly to your chosen provider.
-
 ### Production / TestFlight
 
 ```bash
-eas build --profile production --platform ios
-eas submit --platform ios
+npx eas-cli build --profile production --platform ios
+npx eas-cli submit --platform ios
 ```
 
 ## Project structure
