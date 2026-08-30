@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../src/components/Header';
 import { BodyMap } from '../src/components/BodyMap/BodyMap';
+import { WeeklyActivity } from '../src/components/WeeklyActivity';
 import { ChatThread } from '../src/components/Chat/ChatThread';
 import { ChatInputBar } from '../src/components/Chat/ChatInputBar';
 import { useRecoveryState } from '../src/hooks/useRecoveryState';
@@ -28,7 +29,7 @@ const defaultFatigue = ALL_REGIONS.reduce(
 
 export default function MainScreen() {
   const router = useRouter();
-  const { fatigue, refresh } = useRecoveryState();
+  const { entries, fatigue, refresh } = useRecoveryState();
   const { messages, isLoading, sendMessage, updateEffort } = useChat(refresh);
 
   const handleSend = useCallback(
@@ -67,6 +68,7 @@ export default function MainScreen() {
 
         <View style={styles.mapSection}>
           <BodyMap fatigue={fatigue ?? defaultFatigue} />
+          <WeeklyActivity entries={entries} />
         </View>
 
         <View style={styles.chatSection}>
