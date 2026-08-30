@@ -1,0 +1,39 @@
+# Expo / React Native
+node_modules/
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+ios/
+android/
+
+# Metro
+.metro-health-check*
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Env / secrets — never commit API keys
+.env
+.env.local
+.env*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# EAS
+.eas/
+
+# Logs
+*.log
