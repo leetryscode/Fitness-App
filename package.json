@@ -12,6 +12,7 @@
   "dependencies": {
     "expo": "~57.0.18",
     "expo-constants": "~57.0.16",
+    "expo-dev-client": "~57.0.16",
     "expo-file-system": "~57.0.6",
     "expo-image-picker": "~57.0.14",
     "expo-linking": "~57.0.8",
@@ -32,6 +33,9 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "react-dom": "19.2.3"
   },
   "private": true
 }
