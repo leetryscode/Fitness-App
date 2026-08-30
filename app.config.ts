@@ -13,6 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier: 'com.gymrecovery.app',
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSCameraUsageDescription:
         'Take photos of gym equipment to log what you worked.',
       NSMicrophoneUsageDescription:
