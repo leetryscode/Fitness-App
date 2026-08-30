@@ -29,7 +29,7 @@ const defaultFatigue = ALL_REGIONS.reduce(
 export default function MainScreen() {
   const router = useRouter();
   const { fatigue, refresh } = useRecoveryState();
-  const { messages, isLoading, sendMessage } = useChat(refresh);
+  const { messages, isLoading, sendMessage, updateEffort } = useChat(refresh);
 
   const handleSend = useCallback(
     (text: string) => {
@@ -70,7 +70,11 @@ export default function MainScreen() {
         </View>
 
         <View style={styles.chatSection}>
-          <ChatThread messages={messages} isLoading={isLoading} />
+          <ChatThread
+            messages={messages}
+            isLoading={isLoading}
+            onEffortChange={updateEffort}
+          />
         </View>
 
         <ChatInputBar

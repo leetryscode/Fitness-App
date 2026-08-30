@@ -1,14 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ChatMessage } from '../../types/entry';
+import { ChatMessage, SessionEffort } from '../../types/entry';
+import { EffortSelector } from '../EffortSelector';
 import { colors, spacing, radii, typography } from '../../theme/tokens';
 
 type Props = {
   message: ChatMessage;
+  onEffortChange?: (entryId: string, effort: SessionEffort | null) => void;
 };
 
-export function ChatBubble({ message }: Props) {
+export function ChatBubble({ message, onEffortChange }: Props) {
   const isUser = message.role === 'user';
+  const showEffortSelector =
+    !isUser && message.hasMuscles && message.entryId && onEffortChange;
 
   return (
     <View
@@ -31,6 +35,12 @@ export function ChatBubble({ message }: Props) {
         >
           {message.content}
         </Text>
+        {showEffortSelector && (
+          <EffortSelector
+            value={message.sessionEffort ?? null}
+            onChange={(effort) => onEffortChange(message.entryId!, effort)}
+          />
+        )}
       </View>
     </View>
   );

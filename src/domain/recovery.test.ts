@@ -19,6 +19,8 @@ const squatEntry: Entry = {
   imageReference: null,
   parsedMuscleTags: [{ region: 'quads', intensity: 9 }],
   source: 'chat',
+  sessionEffort: null,
+  sets: null,
 };
 
 const fatigueNow = computeRegionFatigue([squatEntry]);
